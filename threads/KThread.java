@@ -182,19 +182,24 @@ public class KThread {
      * delete this thread.
      */
     public static void finish() {
-	Lib.debug(dbgThread, "Finishing thread: " + currentThread.toString());
-	
-	Machine.interrupt().disable();
+        Lib.debug(dbgThread, "Finishing thread: " + currentThread.toString());
+        
+        Machine.interrupt().disable();
 
-	Machine.autoGrader().finishingCurrentThread();
+        Machine.autoGrader().finishingCurrentThread();
 
-	Lib.assertTrue(toBeDestroyed == null);
-	toBeDestroyed = currentThread;
+        Lib.assertTrue(toBeDestroyed == null);
+        toBeDestroyed = currentThread;
 
 
-	currentThread.status = statusFinished;
-	
-	sleep();
+        currentThread.status = statusFinished;
+        
+        sleep();
+
+        if (joinQueue != null) {
+            KThread nextThread = joinQueue.nextThread();
+            nextThread.ready();
+        }
     }
 
     /**
@@ -273,10 +278,16 @@ public class KThread {
      * thread.
      */
     public void join() {
-	Lib.debug(dbgThread, "Joining to thread: " + toString());
+        Lib.debug(dbgThread, "Joining to thread: " + toString());
+        Lib.assertTrue(this != currentThread);
 
-	Lib.assertTrue(this != currentThread);
-
+        boolean intStatus = Machine.interrupt().disable();
+        if (this != currentThread && status != statusFinished && joined == false) {
+            joined = true;
+            joinQueue.waitForAccess(currentThread);
+            sleep();
+        }
+        Machine.interrupt().enable(intStatus);
     }
 
     /**
@@ -401,10 +412,11 @@ public class KThread {
      * Tests whether this module is working.
      */
     public static void selfTest() {
-	Lib.debug(dbgThread, "Enter KThread.selfTest");
-	
-	new KThread(new PingTest(1)).setName("forked thread").fork();
-	new PingTest(0).run();
+        Lib.debug(dbgThread, "Enter KThread.selfTest");
+        
+        new KThread(new PingTest(1)).setName("forked thread").fork();
+        new PingTest(0).run();
+        System.out.println("hello");
     }
 
     private static final char dbgThread = 't';
@@ -440,6 +452,8 @@ public class KThread {
     /** Number of times the KThread constructor was called. */
     private static int numCreated = 0;
 
+    private static boolean joined = false;
+    private static ThreadQueue joinQueue = null;
     private static ThreadQueue readyQueue = null;
     private static KThread currentThread = null;
     private static KThread toBeDestroyed = null;
