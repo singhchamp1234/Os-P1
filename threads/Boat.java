@@ -30,44 +30,96 @@ public class Boat
 		// variable to be accessible by children.
 		bg = b;
 
-		// Instantiate global variables herek oatLock;
-		Iint numberOfOahuChildren;
-		int numberOfOahuAdults;
-		int numberOfMolokaiChildren;
-		int numberOfMolokaiAdults;
-		Location boatLocation;
-		int numberOfPassengers;
-		Condition2 waitOnMolokai;
-		Condition2 waitOnOahu;
-		Condition waitFullBoat;
-		Communicator communicator;
+		// Instantiate global variables here 
+		static Lock boatLock = new Lock();
+		static int numberOfOahuChildren = children;
+		static int numberOfOahuAdults = adults;
+		static int numberOfMolokaiChildren = 0;
+		static int numberOfMolokaiAdults = 0;
+		static Location boatLocation = Oahu;
+		static Location personLocation = Oahu;
+		static int numberOfPassengers = 0;
+		static Condition waitOnMolokai = new Condition(boatLock);
+		static Condition waitOnOahu = new Condition(boatLock);
+		static Condition waitFullBoat = new Condition(boatLock);
+		static Communicator communicator = new Communicator();
 
 		// Create threads here. See section 3.4 of the Nachos for Java
 		// Walkthrough linked from the projects page.
 
 		Runnable r = new Runnable() {
 			public void run() {
-					SampleItinerary();
-				}
-			};
-			KThread t = new KThread(r);
-			t.setName("Sample Boat Thread");
-			t.fork();
+				ChildItinerary();
+			}
+		};
 
+		for (int i = 0; i < children; i++) {
+			KThread person = new KThread(r_child);
+			person.fork();
+		}
+		for (int i = 0; i < adults; i++) {
+			KThread person = new KThread(r_adult);
+			person.fork();
+		}
     }
 
     static void AdultItinerary()
     {
-		/* This is where you should put your solutions. Make calls
-		to the BoatGrader to show that it is synchronized. For
-		example:
-			bg.AdultRowToMolokai();
-		indicates that an adult has rowed the boat across to Molokai
-		*/
+		boatLock.acquire();
+		if (adult is on Oahu) {
+			if (numberOfPassengers = 2) {
+				waitFullBoat.sleep();
+			} else if (boatLocation != Oahu || numberOfOahuChildren > 1) {
+				waitOnOahu.sleep();
+			} else {
+				numberOfPassengers = 2;
+				bg.AdultRowToMolokai();
+				waitOnMolokai.wakeAll() // Wake up a child sleeping to ride back
+				waitOnMolokai.sleep();
+			}
+		} else (adult is on Molokai) {
+			waitOnMolokai.sleep();
+		}
+		boatLock.release();
     }
 
     static void ChildItinerary()
     {
+		boatLock.acquire();
+		if (child is on Oahu) {
+			if (numberOfPassengers = 2) {
+				waitFullBoat.sleep();
+			} else if (numberOfPassengers = 1 && boatLocation = Oahu) {
+				numberOfPassengers = 2;
+				bg.ChildRideToMolokai();
+				waitOnMolokai.sleep();
+			} else if (boatLocation != Oahu || numberOfOahuChildren = 1) {
+				waitOnOahu.wakeAll(); // Wake up all the adults sleeping
+				waitOnOahu.sleep();
+			} else {
+				numberOfPassengers = 1; // This lets the child you wake up to ride
+				Record numberOfOahuChildren and numberOfOahuAdults
+				waitOnOahu.wakeAll(); // wakes up a child to ride
+				bg.ChildRowToMolokai()
+				if (numberOfOahuChildren > 0 || numberOfOahuAdults > 0) {
+					Wake up a child sleeping with waitOnMolokai
+					waitOnMolokai.sleep();
+				} else {
+					Notify simulation is over with Communicator
+				}
+			}
+		} else (child is on Molokai) {
+			if (numberOfPassengers == 0 && boatLocation == Oahu) {
+				numberOfPassengers = 1;
+				bg.ChildRowtoOahu();
+				waitFullBoat.wakeAll();
+				waitOnOahu.wakeAll();
+				waitOnOahu.sleep();
+			} else {
+				waitOnMolokai.sleep();
+			}
+		}
+		boatLock.release();	
     }
 
     static void SampleItinerary()
