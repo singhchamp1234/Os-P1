@@ -50,6 +50,7 @@ public class Communicator {
             activeSpeaker.sleep();
         }
         message = word;
+        messageReceived = true;
         activeListener.wakeAll();
         waitingSpeakers--;
         master.release();
