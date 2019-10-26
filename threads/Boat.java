@@ -17,38 +17,53 @@ public class Boat
 
 //  	System.out.println("\n ***Testing Boats with 3 children, 3 adults***");
 //  	begin(3, 3, b);
-    }
+	}
+	
+	enum Location
+	{ 
+		Oahu, Molokai;
+	} 
 
     public static void begin( int adults, int children, BoatGrader b )
     {
-	// Store the externally generated autograder in a class
-	// variable to be accessible by children.
-	bg = b;
+		// Store the externally generated autograder in a class
+		// variable to be accessible by children.
+		bg = b;
 
-	// Instantiate global variables here
-	
-	// Create threads here. See section 3.4 of the Nachos for Java
-	// Walkthrough linked from the projects page.
+		// Instantiate global variables herek oatLock;
+		Iint numberOfOahuChildren;
+		int numberOfOahuAdults;
+		int numberOfMolokaiChildren;
+		int numberOfMolokaiAdults;
+		Location boatLocation;
+		int numberOfPassengers;
+		Condition2 waitOnMolokai;
+		Condition2 waitOnOahu;
+		Condition waitFullBoat;
+		Communicator communicator;
 
-	Runnable r = new Runnable() {
-	    public void run() {
-                SampleItinerary();
-            }
-        };
-        KThread t = new KThread(r);
-        t.setName("Sample Boat Thread");
-        t.fork();
+		// Create threads here. See section 3.4 of the Nachos for Java
+		// Walkthrough linked from the projects page.
+
+		Runnable r = new Runnable() {
+			public void run() {
+					SampleItinerary();
+				}
+			};
+			KThread t = new KThread(r);
+			t.setName("Sample Boat Thread");
+			t.fork();
 
     }
 
     static void AdultItinerary()
     {
-	/* This is where you should put your solutions. Make calls
-	   to the BoatGrader to show that it is synchronized. For
-	   example:
-	       bg.AdultRowToMolokai();
-	   indicates that an adult has rowed the boat across to Molokai
-	*/
+		/* This is where you should put your solutions. Make calls
+		to the BoatGrader to show that it is synchronized. For
+		example:
+			bg.AdultRowToMolokai();
+		indicates that an adult has rowed the boat across to Molokai
+		*/
     }
 
     static void ChildItinerary()
