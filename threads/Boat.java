@@ -57,11 +57,9 @@ public class Boat
 	static int numberOfMolokaiChildren;
 	static int numberOfMolokaiAdults;
 	static Location boatLocation;
-	static Location personLocation;
 	static int numberOfPassengers;
 	static Condition waitOnMolokai;
 	static Condition waitOnOahu;
-	static Condition waitFullBoat;
 	static Communicator communicator;
 
     public static void begin( int adults, int children, BoatGrader b )
