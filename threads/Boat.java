@@ -113,7 +113,7 @@ public class Boat
     static void AdultItinerary()
     {
 		boatLock.acquire();
-		// Boat location to determine which island the adult is on as he/she will only be woken up by someone who just arrived to corresponding island
+		// Boat location to determine which island the adult is on as he/she will only be woken up by someone who just arrived to corresponding island or while boat is still on island
 		if (boatLocation == Oahu) {
 			// Only ride to Molokai if 1 child is left on Oahu
 			if (numberOfOahuChildren == 1) {
@@ -137,7 +137,7 @@ public class Boat
     static void ChildItinerary()
     {
 		boatLock.acquire();
-		// Boat location to determine which island the child is on as he/she will only be woken up by someone who just arrived to corresponding island
+		// Boat location to determine which island the child is on as he/she will only be woken up by someone who just arrived to corresponding island or while boat is still on island
 		if (boatLocation == Oahu) {
 			if (numberOfOahuChildren >= 1 && numberOfPassengers == 0) {
 				// Only pairs of children go from Oahu to Molokai, due to solution of problem
@@ -146,9 +146,6 @@ public class Boat
 				bg.ChildRowToMolokai();
 				numberOfMolokaiChildren++;
 				waitOnMolokai.sleep();
-			} else if (numberOfOahuChildren == 1) {
-				waitOnOahu.wakeAll(); // Wake up all the adults sleeping on Oahu
-				waitOnOahu.sleep();
 			} else if (numberOfPassengers == 1) {
 				// since RideToMolokai is called after RowtoMolokai, the passenger will handle the numberOfOahuChilren count and updating of boatLocation for Rower.
 				numberOfOahuChildren -= 2;
@@ -164,6 +161,9 @@ public class Boat
 					// Report back the total number of adults and children on Molokai and end of simulation
 					communicator.speak(numberOfMolokaiAdults + numberOfMolokaiChildren);
 				}
+			} else if (numberOfOahuChildren == 1) {
+				waitOnOahu.wakeAll(); // Wake up all the adults sleeping on Oahu
+				waitOnOahu.sleep();
 			}
 		} else if (boatLocation == Molokai) {
 			// if a child is woken up, it means he/she is tasked to ride back alone to Oahu
