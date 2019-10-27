@@ -57,7 +57,6 @@ public class Boat
 	static int numberOfMolokaiChildren;
 	static int numberOfMolokaiAdults;
 	static Location boatLocation;
-	static Location personLocation;
 	static int numberOfPassengers;
 	static Condition waitOnMolokai;
 	static Condition waitOnOahu;
