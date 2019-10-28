@@ -17,6 +17,7 @@ public class Communicator {
     private int waitingListeners;
     private int waitingSpeakers;
     private int message;
+    private int word;
     private boolean messageReceived;
     private Condition2 activeSpeaker;
     private Condition2 activeListener;
@@ -27,6 +28,7 @@ public class Communicator {
         waitingSpeakers = 0;
         messageReceived = false;
         message = 0;
+	word = 0;
         activeSpeaker = new Condition2(master);
         activeListener = new Condition2(master);
     }
@@ -67,7 +69,6 @@ public class Communicator {
             activeSpeaker.wakeAll();
             activeListener.sleep();
         }
-        int word = 0;
 	int temp = this.word;
         waitingListeners--;
         master.release();
