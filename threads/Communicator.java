@@ -17,18 +17,18 @@ public class Communicator {
     private int waitingListeners;
     private int waitingSpeakers;
     private int message;
-    private boolean messageReceived;
-    private Condition2 activeSpeaker;
-    private Condition2 activeListener;
+    private boolean messageReadyToListen;
+    private Condition activeSpeaker;
+    private Condition activeListener;
 
     public Communicator() {
         master = new Lock();
         waitingListeners = 0;
         waitingSpeakers = 0;
-        messageReceived = false;
+        messageReadyToListen = false;
         message = 0;
-        activeSpeaker = new Condition2(master);
-        activeListener = new Condition2(master);
+        activeSpeaker = new Condition(master);
+        activeListener = new Condition(master);
     }
 
     /**
@@ -44,11 +44,11 @@ public class Communicator {
     public void speak(int word) {
         master.acquire();
         waitingSpeakers++;
-        while(waitingSpeakers > 0 || !messageReceived){
+        while(waitingListeners == 0 || messageReadyToListen == true){
             activeSpeaker.sleep();
         }
         message = word;
-        messageReceived = true;
+        messageReadyToListen = true;
         activeListener.wakeAll();
         waitingSpeakers--;
         master.release();
@@ -63,13 +63,13 @@ public class Communicator {
     public int listen() {
         master.acquire();
         waitingListeners++;
-        while(!messageReceived){
+        while(messageReadyToListen == false){
             activeSpeaker.wakeAll();
             activeListener.sleep();
         }
-        int temp = this.word;
         waitingListeners--;
+        messageReadyToListen = false;
         master.release();
-        return temp;
+        return message;
     }
 }
