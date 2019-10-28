@@ -115,20 +115,28 @@ public class Boat
 		boatLock.acquire();
 		// Boat location to determine which island the adult is on as he/she will only be woken up by someone who just arrived to corresponding island or while boat is still on island
 		if (boatLocation == Oahu) {
-			// Only ride to Molokai if 1 child is left on Oahu
+			// Only row to Molokai if 1 child is left on Oahu
 			if (numberOfOahuChildren == 1) {
+				// Row to Molokai
 				numberOfOahuAdults--;
 				bg.AdultRowToMolokai();
 				numberOfMolokaiAdults++;
 				boatLocation = Molokai;
-				waitOnMolokai.wake(); // Wake up a child to row back to Oahu (to pair up with the 1 child on Oahu; if adult is woken up he/she will wake up a child)
+
+				// Wake up a child to row back to Oahu (to pair up with the 1 child on Oahu; if adult is woken up he/she will wake up a child)
+				waitOnMolokai.wake();
+
 				waitOnMolokai.sleep();
-			} else if (numberOfOahuChildren > 1) {
+			} else if (numberOfOahuChildren > 1 || numberOfPassengers == 1) {
+				// Wake up a child if there is a pair of children on Oahu and/or a child is supposed to ride to Molokai
+				waitOnOahu.wake();
+
 				waitOnOahu.sleep();
 			}
 		} else if (boatLocation == Molokai) {
-			// if an adult is woken up he/she will wake up a child to row back to Oahu
+			// If an adult is woken up he/she will wake up a child to row back to Oahu
 			waitOnMolokai.wake();
+
 			waitOnMolokai.sleep();
 		}
 		boatLock.release();
@@ -139,39 +147,53 @@ public class Boat
 		boatLock.acquire();
 		// Boat location to determine which island the child is on as he/she will only be woken up by someone who just arrived to corresponding island or while boat is still on island
 		if (boatLocation == Oahu) {
-			if (numberOfOahuChildren >= 1 && numberOfPassengers == 0) {
+			if (numberOfOahuChildren >= 1 && numberOfPassengers == 0) {	// Rower
 				// Only pairs of children go from Oahu to Molokai, due to solution of problem
 				numberOfPassengers = 1;
-				waitOnOahu.wakeAll(); // Wake up a child to ride to Molokai
+
+				// Wake up a child to ride to Molokai
+				waitOnOahu.wake();
+
+				// Row to Molokai
+				numberOfOahuChildren--;
 				bg.ChildRowToMolokai();
 				numberOfMolokaiChildren++;
 				waitOnMolokai.sleep();
-			} else if (numberOfPassengers == 1) {
-				// since RideToMolokai is called after RowtoMolokai, the passenger will handle the numberOfOahuChilren count and updating of boatLocation for Rower.
-				numberOfOahuChildren -= 2;
+			} else if (numberOfPassengers == 1) { // Rider
+				// Ride to Molokai
+				numberOfOahuChildren--;
 				bg.ChildRideToMolokai();
 				numberOfMolokaiChildren++;
-				boatLocation = Molokai;
+				boatLocation = Molokai; // Since RideToMolokai is called after RowtoMolokai, the passenger/rider will update boatLocation for Rower.
 				numberOfPassengers = 0;
+
 				// Child just rode from Oahu so it should know/remember number of children and adults
 				if (numberOfOahuChildren > 0 || numberOfOahuAdults > 0) {
-					waitOnMolokai.wakeAll(); // Wake up a child to ride back to Oahu
+					// Wake up a child to ride back to Oahu
+					waitOnMolokai.wake();
+
 					waitOnMolokai.sleep();
 				} else {
 					// Report back the total number of adults and children on Molokai and end of simulation
 					communicator.speak(numberOfMolokaiAdults + numberOfMolokaiChildren);
 				}
 			} else if (numberOfOahuChildren == 1) {
-				waitOnOahu.wakeAll(); // Wake up all the adults sleeping on Oahu
+				// Wake up an adult sleeping on Oahu to row to Molokai
+				waitOnOahu.wake();
+
 				waitOnOahu.sleep();
 			}
 		} else if (boatLocation == Molokai) {
-			// if a child is woken up, it means he/she is tasked to ride back alone to Oahu
+			// If a child is woken up, it means he/she is tasked to ride back alone to Oahu
+			// Row to Oahu
 			numberOfMolokaiChildren--;
 			bg.ChildRowtoOahu();
 			numberOfOahuChildren++;
 			boatLocation = Oahu;
-			waitOnOahu.wakeAll();
+
+			// Wake up a person sleeping on Oahu
+			waitOnOahu.wake();
+
 			waitOnOahu.sleep();
 		}
 		boatLock.release();	
