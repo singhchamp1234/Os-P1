@@ -69,12 +69,9 @@ public class Condition2 {
         
         // checks if waitQueue is not empty
         if(!readyQueue.isEmpty()) {	
-            
             // remove first thread from waitQueue and add to readyQueue
             ((KThread) readyQueue.removeFirst()).ready();
-            
         }
-	
 		// interrupt re-enabled
 		Machine.interrupt().restore(intStatus);		
 }
@@ -85,9 +82,10 @@ public class Condition2 {
      */
     public void wakeAll() {
 		Lib.assertTrue(conditionLock.isHeldByCurrentThread());
-	    
-	    while(!readyQueue.isEmpty()) 
+	    // wake up everybody in readyQueue
+	    while(!readyQueue.isEmpty()) {
 	    	wake();
+        }
     }
     
     private Lock conditionLock;
