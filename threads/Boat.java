@@ -16,9 +16,9 @@ public class Boat
 		System.out.println("\n ***Testing Boats with 2 children, 1 adult***");
 		begin(1, 2, b);
 
-		System.out.println("\n ***Testing Boats with 2 children, 3 adults***");
+		System.out.println("\n ***Testing Boats with 3 children, 3 adults***");
 		begin(3, 3, b);
-
+		/*
 		System.out.println("\n ***Testing Boats with 2 children, 5 adults***");
 		begin(5, 2, b);
 
@@ -45,6 +45,7 @@ public class Boat
 
 		System.out.println("\n ***Testing Boats with 50 children, 37 adults***");
 		begin(37, 50, b);
+		*/
 	}
 	
 	enum Location
@@ -109,7 +110,7 @@ public class Boat
 		}
 
 		int numberOfMolokaiPeople = communicator.listen();
-		// System.out.println("All " + numberOfMolokaiPeople + " of the children and adults are all now on Molokai.");
+		//System.out.println("All " + numberOfMolokaiPeople + " of the children and adults are all now on Molokai.");
     }
 
     static void AdultItinerary(Location adultLocation)
@@ -191,9 +192,9 @@ public class Boat
 						waitOnMolokai.sleep();
 					} else {
 						// Report back the total number of adults and children on Molokai and end of simulation
-						//System.out.println("Adults: " + numberOfMolokaiAdults);
-						//System.out.println("Children: " + numberOfMolokaiChildren);
 						communicator.speak(numberOfMolokaiAdults + numberOfMolokaiChildren);
+
+						waitOnOahu.sleep();
 					}
 				} else if (numberOfOahuChildren == 1) {
 					// Wake up an adult sleeping on Oahu to row to Molokai
