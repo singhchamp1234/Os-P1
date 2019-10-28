@@ -68,7 +68,7 @@ public class Communicator {
             activeListener.sleep();
         }
         int word = 0;
-		int temp = word;
+	int temp = this.word;
         waitingListeners--;
         master.release();
         return temp;
