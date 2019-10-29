@@ -42,18 +42,20 @@ public class PriorityScheduler extends Scheduler {
 	public ThreadQueue newThreadQueue(boolean transferPriority) {
 		return new PriorityQueue(transferPriority);
 	}
-
+// Get the priority of the specified thread that we are looking at
 	public int getPriority(KThread thread) {
 		Lib.assertTrue(Machine.interrupt().disabled());
 
 		return getThreadState(thread).getPriority();
 	}
-
+// Get the effective priority of the specified thread needed.
 	public int getEffectivePriority(KThread thread) {
 		Lib.assertTrue(Machine.interrupt().disabled());
 
 		return getThreadState(thread).getEffectivePriority();
 	}
+// Set the priority of the specified thread. that we are currently looking at
+
 
 	public void setPriority(KThread thread, int priority) {
 		Lib.assertTrue(Machine.interrupt().disabled());
@@ -78,7 +80,7 @@ public class PriorityScheduler extends Scheduler {
 		Machine.interrupt().restore(intStatus);
 		return true;
 	}
-
+// If possible, lower the priority of the current thread user in some scheduler-dependent way, preferably by the same amount as would a call to increasePriority(
 	public boolean decreasePriority() {
 		boolean intStatus = Machine.interrupt().disable();
 
@@ -124,12 +126,13 @@ public class PriorityScheduler extends Scheduler {
 	 * A <tt>ThreadQueue</tt> that sorts threads by priority.
 	 */
 	protected class PriorityQueue extends ThreadQueue {
-
+// transferPriority - true if this queue should transfer priority 
+// from the waiting threads, to the current owning thread available
 		PriorityQueue(boolean transferPriority) {
 			this.transferPriority = transferPriority;
 			this.threadsList = new LinkedList<ThreadState>();
 		}
-
+// Return the scheduling state of the specified thread.
 		public void waitForAccess(KThread thread) {
 			Lib.assertTrue(Machine.interrupt().disabled());
 			final ThreadState threadStateObject = getThreadState(thread);
@@ -139,7 +142,7 @@ public class PriorityScheduler extends Scheduler {
 
 		public void acquire(KThread thread) {
 			Lib.assertTrue(Machine.interrupt().disabled());
-			ThreadState threadStateObject = getThreadState(thread);
+			final ThreadState threadStateObject = getThreadState(thread);
 			if (this.resourceHolder != null)
 			{
 				this.resourceHolder.release(this);
@@ -298,8 +301,8 @@ public class PriorityScheduler extends Scheduler {
 		public int getEffectivePriority() {
 
 			//if resources is empty
-			boolean flag = this.availableResources.isEmpty();
-			boolean updatePriority = this.updatePriority;
+			bool flag = this.availableResources.isEmpty();
+			bool updatePriority = this.updatePriority;
 			if (flag==true) 
 			{
 				return this.getPriority();
@@ -323,13 +326,15 @@ public class PriorityScheduler extends Scheduler {
 		 *
 		 * @param priority the new priority.
 		 */
+        // public void to setPriority in place
 		public void setPriority(int priority)
 		{
 			if (this.priority == priority)
 				return;
 			this.priority = priority;
-			if (requiredResources != null) {
-				for (PriorityQueue priorityQueueObject : requiredResources) 
+			if (requiredResources != null) 
+			{
+				for (final PriorityQueue priorityQueueObject : requiredResources) 
 				{
 					priorityQueueObject.incorrectCashedPriority();
 				}
@@ -363,6 +368,7 @@ public class PriorityScheduler extends Scheduler {
 		 * @see nachos.threads.ThreadQueue#acquire
 		 * @see nachos.threads.ThreadQueue#nextThread
 		 */
+        // add to the pqObject, and remove the pqObject
 		public void acquire(PriorityQueue pqObject)
 		{
 			this.availableResources.add(pqObject);
@@ -373,8 +379,9 @@ public class PriorityScheduler extends Scheduler {
 		//release function
 		public void release(PriorityQueue  pqObject) 
 		{
-			this.availableResources.remove(pqObject);
+			this.availableResources.remove(pqObject);// remove the avialbe resource from the pqObject
 			this.incorrectCashedPriority();
+            // does not have the incorrectCashed Priority
 		}
 
 		public KThread getThread() {
@@ -398,7 +405,3 @@ public class PriorityScheduler extends Scheduler {
 		protected int effectivePriority = priorityMinimum;
 	}
 }
-
-   
-	
-	
