@@ -38,8 +38,8 @@ public class Alarm {
 			this.wake = wakeTime;
 			this.waitThread = wakeThread;
 		}
+	} 
 
-} 
 	public void timerInterrupt() {
 		boolean status = Machine.interrupt().disable();
 		wakeup threadNext;
@@ -49,7 +49,8 @@ public class Alarm {
 			if (Machine.timer().getTime() >= threadNext.wake) {
 				obj.remove();
 				threadNext.waitThread.ready();
-			}	}
+			}	
+		}
 		KThread.yield();
 		Machine.interrupt().restore(status);
 	}
