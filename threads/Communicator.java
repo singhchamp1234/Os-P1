@@ -47,13 +47,13 @@ public class Communicator {
      */
     public void speak(int word) {
         master.acquire();
-        // ensure only 1 speaker is sleeping as active speaker while the rest sleep in queue
+        // ensure only 1 waiting speaker is sleeping as active speaker while the rest sleep in queue
         while (waitingSpeakers == 1) {
             speakerQueue.sleep();
         }
         waitingSpeakers++;
         // wait for a listener to pair with
-        while(waitingListeners == 0 || messageReadyToListen == true){
+        while (waitingListeners == 0 || messageReadyToListen == true) {
             activeSpeaker.sleep();
         }
         waitingSpeakers--;
@@ -76,14 +76,14 @@ public class Communicator {
      */    
     public int listen() {
         master.acquire();
-        // ensure only 1 listener is sleeping as active listener while the rest sleep in queue
+        // ensure only 1 waiting listener is sleeping as active listener while the rest sleep in queue
         while (waitingListeners == 1) {
             listenerQueue.sleep();
         }
         waitingListeners++;
         // wait for a speaker to pair with
-        while(messageReadyToListen == false){
-            activeSpeaker.wakeAll();
+        while (messageReadyToListen == false) {
+            activeSpeaker.wake();
             activeListener.sleep();
         }
         waitingListeners--;
