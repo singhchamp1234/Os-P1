@@ -23,10 +23,11 @@ public class Condition2 {
      *				<tt>wake()</tt>, or <tt>wakeAll()</tt>.
      */
     public Condition2(Lock conditionLock) {
-		this.conditionLock = conditionLock;
-		
-		// Condition2 constraint: no semaphores -> using KThread
-		readyQueue = new LinkedList<KThread>();
+	this.conditionLock = conditionLock;
+	
+	// Condition2 constraint: no semaphores -> using LinkedList/KThread
+	   //initialized in KThread
+	readyQueue = new LinkedList<KThread>(); 
     }
 
     /**
@@ -36,25 +37,27 @@ public class Condition2 {
      * automatically reacquire the lock before <tt>sleep()</tt> returns.
      */
     public void sleep() {
-        Lib.assertTrue(conditionLock.isHeldByCurrentThread());
-        
-        // interrupt disabled with lock
-        boolean intStatus = Machine.interrupt().disable();
-        
-        // releasing the lock
-        conditionLock.release();
-        
-        // currentThread added to waitQueue
-        readyQueue.add(KThread.currentThread());
-        
-        // currentThread goes to sleep
-        KThread.sleep();
-        
-        // lock acquired
-        conditionLock.acquire();
-        
-        // interrupt enabled
-        Machine.interrupt().restore(intStatus);
+	Lib.assertTrue(conditionLock.isHeldByCurrentThread());
+	
+	// interrupt disabled with lock
+	boolean intStatus = Machine.interrupt().disable();
+	
+	// lock released
+	conditionLock.release();
+	
+	// currentThread added to readyQueue (consists of waiting threads)
+	readyQueue.add(KThread.currentThread());
+	
+	// currentThread goes to sleep
+	KThread.sleep();
+	
+	// lock acquired
+	conditionLock.acquire();
+	
+	// interrupt enabled
+	Machine.interrupt().restore(intStatus);
+	
+	
     }
 
     /**
@@ -62,18 +65,22 @@ public class Condition2 {
      * current thread must hold the associated lock.
      */
     public void wake() {
-        Lib.assertTrue(conditionLock.isHeldByCurrentThread());
-        
-        // interrupt disabled with lock
-        boolean intStatus = Machine.interrupt().disable();
-        
-        // checks if waitQueue is not empty
-        if(!readyQueue.isEmpty()) {	
-            // remove first thread from waitQueue and add to readyQueue
-            ((KThread) readyQueue.removeFirst()).ready();
-        }
+	Lib.assertTrue(conditionLock.isHeldByCurrentThread());
+	
+	// interrupt disabled with lock
+	boolean intStatus = Machine.interrupt().disable();
+	
+	// check if readyQueue is not empty
+	if(!readyQueue.isEmpty()) {	
+		
+		// remove first thread from readyQueue and add to the end of threads to be implemented
+		((KThread) readyQueue.removeFirst()).ready();
+		
+	}
+	
 		// interrupt re-enabled
-		Machine.interrupt().restore(intStatus);		
+		Machine.interrupt().restore(intStatus);
+		
 }
 
     /**
@@ -81,11 +88,11 @@ public class Condition2 {
      * thread must hold the associated lock.
      */
     public void wakeAll() {
-		Lib.assertTrue(conditionLock.isHeldByCurrentThread());
-	    // wake up everybody in readyQueue
-	    while(!readyQueue.isEmpty()) {
-	    	wake();
-        }
+	Lib.assertTrue(conditionLock.isHeldByCurrentThread());
+	    
+    // adapted from Condition.java which does not use semaphores
+    while(!readyQueue.isEmpty()) 
+    	wake();
     }
     
     private Lock conditionLock;
