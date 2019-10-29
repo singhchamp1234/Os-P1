@@ -301,8 +301,8 @@ public class PriorityScheduler extends Scheduler {
 		public int getEffectivePriority() {
 
 			//if resources is empty
-			bool flag = this.availableResources.isEmpty();
-			bool updatePriority = this.updatePriority;
+			boolean flag = this.availableResources.isEmpty();
+			boolean updatePriority = this.updatePriority;
 			if (flag==true) 
 			{
 				return this.getPriority();
