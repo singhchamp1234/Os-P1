@@ -183,7 +183,7 @@ public class KThread {
      */
     public static void finish() {
         Lib.debug(dbgThread, "Finishing thread: " + currentThread.toString());
-        System.out.println("Finishing thread: " + currentThread.toString());
+
         Machine.interrupt().disable();
 
         Machine.autoGrader().finishingCurrentThread();
@@ -193,13 +193,13 @@ public class KThread {
 
 
         currentThread.status = statusFinished;
-        
-        sleep();
 
         if (joinQueue != null) {
             KThread nextThread = joinQueue.nextThread();
             nextThread.ready();
         }
+        
+        sleep();
     }
 
     /**
@@ -280,7 +280,7 @@ public class KThread {
     public void join() {
         Lib.debug(dbgThread, "Joining to thread: " + toString());
         Lib.assertTrue(this != currentThread);
-        System.out.println("Joining to thread: " + toString());
+
         boolean intStatus = Machine.interrupt().disable();
         if (joinQueue == null) {
             joinQueue = ThreadedKernel.scheduler.newThreadQueue(false);
