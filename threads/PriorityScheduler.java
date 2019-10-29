@@ -139,7 +139,7 @@ public class PriorityScheduler extends Scheduler {
 
 		public void acquire(KThread thread) {
 			Lib.assertTrue(Machine.interrupt().disabled());
-			final ThreadState threadStateObject = getThreadState(thread);
+			ThreadState threadStateObject = getThreadState(thread);
 			if (this.resourceHolder != null)
 			{
 				this.resourceHolder.release(this);
@@ -328,9 +328,11 @@ public class PriorityScheduler extends Scheduler {
 			if (this.priority == priority)
 				return;
 			this.priority = priority;
-			for (final PriorityQueue priorityQueueObject : requiredResources) 
-			{
-				priorityQueueObject.incorrectCashedPriority();
+			if (requiredResources != null) {
+				for (PriorityQueue priorityQueueObject : requiredResources) 
+				{
+					priorityQueueObject.incorrectCashedPriority();
+				}
 			}
 		}
 
