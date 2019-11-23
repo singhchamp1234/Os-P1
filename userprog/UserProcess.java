@@ -335,6 +335,15 @@ public class UserProcess {
 	processor.writeRegister(Processor.regA1, argv);
     }
 
+    public int getNextFileDescriptor() {
+        for (int i = 2; i < MAX_FD; i++) {
+            if (files[i] == null) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     /**
      * Handle the halt() system call. 
      */
@@ -344,6 +353,23 @@ public class UserProcess {
 	
 	Lib.assertNotReached("Machine.halt() did not halt machine!");
 	return 0;
+    }
+
+    handleCreate(int a0) {
+        String fileName = readVirtualMemoryString(a0, MAX_STRING_LEN);
+        OpenFile file = UserKernel.fileSystem.open(fileName, true);
+
+        if (file != null) {
+            int fd = getNextFileDescriptor();
+            if (fd != -1) {
+                files[fd] = file;
+                fileNames[fd] = fileName;
+            } else {
+                return -1;
+            }
+        } else {
+            return -1;
+        }
     }
 
 
@@ -465,10 +491,11 @@ public class UserProcess {
     private static final int pageSize = Processor.pageSize;
     private static final char dbgProcess = 'a';
 
+    // Index of files and fileNames act as file descriptors
     private static final int MAX_FD = 16;
-    private static int fileDescriptors[] = new int[MAX_FD];
+    private static OpenFile files[] = new OpenFile[MAX_FD];
 
     private static final int MAX_STRING_LEN = 256;
-    private static String fileNames[] = new String[fileNames];
+    private static String fileNames[] = new String[MAX_FD];
 
 }
