@@ -464,4 +464,11 @@ public class UserProcess {
 	
     private static final int pageSize = Processor.pageSize;
     private static final char dbgProcess = 'a';
+
+    private static final int MAX_FD = 16;
+    private static int fileDescriptors[] = new int[MAX_FD];
+
+    private static final int MAX_STRING_LEN = 256;
+    private static String fileNames[] = new String[fileNames];
+
 }
