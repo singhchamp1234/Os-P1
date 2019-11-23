@@ -388,17 +388,33 @@ public class UserProcess {
      * @return	the value to be returned to the user.
      */
     public int handleSyscall(int syscall, int a0, int a1, int a2, int a3) {
-	switch (syscall) {
-	case syscallHalt:
-	    return handleHalt();
-
-
-	default:
-	    Lib.debug(dbgProcess, "Unknown syscall " + syscall);
-	    Lib.assertNotReached("Unknown system call!");
-	}
-	return 0;
+        switch (syscall) {
+            case syscallHalt:
+                return handleHalt();
+            case syscallExit:
+                return handleExit();
+            case syscallExec:
+                return handleExec();
+            case syscallJoin:
+                return handleJoin();
+            case syscallCreate:
+                return handleCreate();
+            case syscallOpen:
+                return handleOpen();            
+            case syscallWrite:
+                return handleWrite();
+            case syscallClose:
+                return handleClose();            
+            case syscallUnlink:
+                return handleUnlink();
+            default:
+            Lib.debug(dbgProcess, "Unknown syscall " + syscall);
+            Lib.assertNotReached("Unknown system call!");
+        }
+        return 0;
     }
+
+    
 
     /**
      * Handle a user exception. Called by
