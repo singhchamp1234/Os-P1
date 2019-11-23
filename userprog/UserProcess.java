@@ -392,21 +392,23 @@ public class UserProcess {
             case syscallHalt:
                 return handleHalt();
             case syscallExit:
-                return handleExit();
+                return handleExit(a0);
             case syscallExec:
-                return handleExec();
+                return handleExec(a0, a1, a2);
             case syscallJoin:
-                return handleJoin();
+                return handleJoin(a0, a1);
             case syscallCreate:
-                return handleCreate();
+                return handleCreate(a0);
             case syscallOpen:
-                return handleOpen();            
+                return handleOpen(a0);
+            case syscallRead:
+                return handleRead(a0, a1, a2);           
             case syscallWrite:
-                return handleWrite();
+                return handleWrite(a0, a1, a2);
             case syscallClose:
-                return handleClose();            
+                return handleClose(a0);            
             case syscallUnlink:
-                return handleUnlink();
+                return handleUnlink(a0);
             default:
             Lib.debug(dbgProcess, "Unknown syscall " + syscall);
             Lib.assertNotReached("Unknown system call!");
