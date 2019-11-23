@@ -56,7 +56,7 @@ public class LotteryScheduler extends PriorityScheduler {
     @Override
     protected ThreadState getThreadState(KThread kThread) {
 		kThread.schedulingState = (kThread.schedulingState == null) ? 
-			new LotteryThreadState(kThread) : kTread.schedulingState;
+			new LotteryThreadState(kThread) : kThread.schedulingState;
         return (ThreadState) kThread.schedulingState;
     }
 
@@ -87,7 +87,7 @@ public class LotteryScheduler extends PriorityScheduler {
             int total = this.getEffectivePriority();
             int winner = 0;
 			if(total > 0){
-				winner = entropy.nextInt(totalTickets)
+				winner = entropy.nextInt(totalTickets);
 			}
             for (final ThreadState thread : this.threadsWaiting) {
                 Lib.assertTrue(thread instanceof LotteryThreadState);
