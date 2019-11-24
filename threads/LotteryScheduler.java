@@ -56,7 +56,7 @@ public class LotteryScheduler extends PriorityScheduler {
     @Override
     protected ThreadState getThreadState(KThread kThread) {
 		kThread.schedulingState = (kThread.schedulingState == null) ? 
-			new LotteryThreadState(kThread) : kTread.schedulingState;
+			new LotteryThreadState(kThread) : kThread.schedulingState;
         return (ThreadState) kThread.schedulingState;
     }
 
