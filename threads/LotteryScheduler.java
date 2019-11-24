@@ -56,7 +56,7 @@ public class LotteryScheduler extends PriorityScheduler {
     @Override
     protected ThreadState getThreadState(KThread kThread) {
 		kThread.schedulingState = (kThread.schedulingState == null) ? 
-			new LotteryThreadState(kThread) : kThread.schedulingState;
+			new LotteryThreadState(kThread) : kTread.schedulingState;
         return (ThreadState) kThread.schedulingState;
     }
 
@@ -69,27 +69,27 @@ public class LotteryScheduler extends PriorityScheduler {
         public int getEffectivePriority() {
             if (!this.transferPriority) {
                 return 0; //minimum priority
-            } else if (this.priorityChange) {
+            } else if (this.updatePriority) {
                 // Effective priorities recalculation
                 this.effectivePriority = 0;
-                for (final ThreadState current : this.threadsWaiting) {
+                for (final ThreadState current : this.threadsList) {
                     Lib.assertTrue(current instanceof LotteryThreadState);
                     this.effectivePriority = this.effectivePriority + 
 						current.getEffectivePriority();
                 }
-                this.priorityChange = false;
+                this.updatePriority = false;
             }
             return effectivePriority;
 
         }
         @Override
         public ThreadState pickNextThread() {
-            int total = this.getEffectivePriority();
+            int totalTickets = this.getEffectivePriority();
             int winner = 0;
-			if(total > 0){
-				winner = entropy.nextInt(totalTickets);
+			if(totalTickets > 0){
+				winner = entropy.nextInt(totalTickets)
 			}
-            for (final ThreadState thread : this.threadsWaiting) {
+            for (final ThreadState thread : this.threadsList) {
                 Lib.assertTrue(thread instanceof LotteryThreadState);
                 winner = winner - thread.getEffectivePriority();
                 if (winner <= 0) {
@@ -106,16 +106,16 @@ public class LotteryScheduler extends PriorityScheduler {
         }
         @Override
         public int getEffectivePriority() {
-            if (this.resourcesIHave.isEmpty() == true) {
+            if (this.availableResources.isEmpty() == true) {
                 return this.getPriority();
-            } else if (this.priorityChange) {
+            } else if (this.updatePriority) {
                 this.effectivePriority = this.getPriority();
-                for (final PriorityQueue pq : this.resourcesIHave) {
+                for (final PriorityQueue pq : this.availableResources) {
                     Lib.assertTrue(pq instanceof LotteryPriorityQueue);
                     this.effectivePriority = this.effectivePriority +
 					pq.getEffectivePriority();
                 }
-                this.priorityChange = false;
+                this.updatePriority = false;
             }
             return this.effectivePriority;
         }
